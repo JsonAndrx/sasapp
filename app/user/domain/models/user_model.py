@@ -16,3 +16,4 @@ class UserModel(Base):
     type_business = Column(Integer)
     created_at = Column(Date)
     is_active = Column(Integer)
+    role = Column(String)

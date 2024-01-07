@@ -15,7 +15,8 @@ class AuthServices:
         return self.repo.register_user(user)
     
     def login_user(self, user: LoginSchema):
-        if self.repo.login_user(user.username, user.password) == None:
+        user_data = self.repo.login_user(user.username, user.password)
+        if user_data == None:
             raise HTTPException(status_code=400, detail="User not exists")
-        response = create_token({"username": user.username, "login": 'paso'})
+        response = create_token({"username": user_data.username, "id": user_data.id, "role": user_data.role})
         return {"username": user.username, "token": response}

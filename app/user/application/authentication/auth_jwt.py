@@ -11,18 +11,35 @@ class JWTBearer(HTTPBearer):
         if credentials:
             if not credentials.scheme == "Bearer":
                 raise HTTPException(status_code=403, detail="Invalid authentication")
-            if not self.verify_jwt(credentials.credentials):
+            payload = self.verify_jwt(credentials.credentials)
+            if not payload:
                 raise HTTPException(status_code=403, detail="Invalid token")
-            return credentials.credentials
+            return payload
         else:
             raise HTTPException(status_code=403, detail="Invalid authorization code")
-        
-    def verify_jwt(self, jwtoken: str) -> bool:
-        is_token_valid = False
+    
+class JWTUserBearer(JWTBearer):
+    def verify_jwt(self, jwtoken: str) -> dict:
+        payload = None
         try:
             payload = decode_token(jwtoken)
         except:
             payload = None
         if payload:
-            is_token_valid = True
-        return is_token_valid 
+            user_role = payload.get("role")
+            if user_role != "user":
+                raise HTTPException(status_code=403, detail="Invalid user role")
+        return payload
+
+class JWTAdminBearer(JWTBearer):
+    def verify_jwt(self, jwtoken: str) -> bool:
+        payload = None
+        try:
+            payload = decode_token(jwtoken)
+        except:
+            payload = None
+        if payload:
+            user_role = payload.get("role")
+            if user_role != "admin":
+                raise HTTPException(status_code=403, detail="Invalid user role")
+        return payload

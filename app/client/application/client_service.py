@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from client.domain.repositories.client_repositories import ClientRepository
 from client.domain.schemas.client_schema import ClientSchema
 
@@ -15,7 +15,7 @@ class ClientService:
     
     def get_client_by_user(self, user_id):
         data = self.client_repo.get_client_by_user(user_id)
-        print(data)
+        print(data, user_id)
         if len(data) == 0:
             raise HTTPException(status_code=400, detail="You don't have a client")
         return self.client_repo.get_client_by_user(user_id)
